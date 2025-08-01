@@ -2,6 +2,7 @@ package com.beyond.ordersystem.product.service;
 
 import com.beyond.ordersystem.member.domain.Member;
 import com.beyond.ordersystem.member.repository.MemberRepository;
+import com.beyond.ordersystem.common.service.StockInventoryService;
 import com.beyond.ordersystem.product.domain.Product;
 import com.beyond.ordersystem.product.dto.ProductCreateDto;
 import com.beyond.ordersystem.product.dto.ProductResDto;
@@ -27,7 +28,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -37,6 +37,8 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
     private final S3Client s3Client;
+    private final StockInventoryService stockInventoryService;
+
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -81,7 +83,10 @@ public class ProductService {
 
             product.setProductImgae(imgUrl);
         }
+        System.out.println("상품등록 service");
 
+        // 상품등록시 redis에 재고세팅
+        stockInventoryService.makeStockQuantity(product.getId(), product.getStockQuantity());
 
         return product.getId();
     }
@@ -154,6 +159,8 @@ public class ProductService {
             product.setProductImgae(null);
         }
 
+//        상품등록시 redis에 재고세팅
+        stockInventoryService.makeStockQuantity(product.getId(),product.getStockQuantity());
         return product.getId();
     }
 

@@ -24,25 +24,28 @@ public class OrderingController {
     @PostMapping("/create")
     public ResponseEntity<?> createOrdering(@RequestBody @Valid List<OrderCreateDto> dto) {
 
-        Long id = orderingService.createOrdering(dto);
+        Long id = orderingService.createConcurrent(dto);
 
         return new ResponseEntity<>(new CommonSuccessDto(id, HttpStatus.OK.value(), "주문 성공"), HttpStatus.CREATED);
     }
 
     // 주문 목록 조회
     @GetMapping("/list")
-    public ResponseEntity<?> getOrderingList() {
+    public ResponseEntity<?> findAll() {
 
-        List<OrderListResDto> orderListResDtoList = orderingService.getOrderingList();
+        List<OrderListResDto> orderListResDtoList = orderingService.findAll();
 
         return new ResponseEntity<>(new CommonSuccessDto(orderListResDtoList, HttpStatus.OK.value(), "주문목록 조회 성공"), HttpStatus.OK);
     }
 
     @GetMapping("/myorders")
     public ResponseEntity<?> myOrders() {
-        List<OrderListResDto> orderListResDtoList = orderingService.getOrderingList();
+        List<OrderListResDto> orderListResDtoList = orderingService.myorders();
         return new ResponseEntity<>(
-                new CommonSuccessDto(orderListResDtoList, HttpStatus.OK.value(), "주문목록 조회 성공"), HttpStatus.OK);
+                new CommonSuccessDto(
+                        orderListResDtoList,
+                        HttpStatus.OK.value(),
+                        "주문목록 조회 성공"), HttpStatus.OK);
     }
 
 

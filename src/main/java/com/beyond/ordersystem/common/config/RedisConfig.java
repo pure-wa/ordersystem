@@ -55,7 +55,7 @@ public class RedisConfig {
 
     @Bean
     @Qualifier("stockInventory")
-    public RedisTemplate<String, String> stockTemplate(@Qualifier("stockInventory") RedisConnectionFactory stockConnectionFactory) {
+    public RedisTemplate<String, String> stockInventory(@Qualifier("stockInventory") RedisConnectionFactory stockConnectionFactory) {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
