@@ -1,5 +1,6 @@
 package com.beyond.ordersystem.ordering.service;
 
+import com.beyond.ordersystem.common.service.SseAlarmService;
 import com.beyond.ordersystem.common.service.StockInventoryService;
 import com.beyond.ordersystem.common.service.StockRabbitMqService;
 import com.beyond.ordersystem.member.domain.Member;
@@ -14,6 +15,7 @@ import com.beyond.ordersystem.ordering.repository.OrderingDetailRepository;
 import com.beyond.ordersystem.ordering.repository.OrderingRepository;
 import com.beyond.ordersystem.product.domain.Product;
 import com.beyond.ordersystem.product.repository.ProductRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -35,6 +37,7 @@ public class OrderingService {
     private final OrderingDetailRepository orderingDetailRepository;
     private final StockInventoryService stockInventoryService;
     private final StockRabbitMqService stockRabbitMqService;
+    private final SseAlarmService sseAlarmService;
 
     // 주문 생성
     public Long createOrdering(List<OrderCreateDto> dtos) {
@@ -140,5 +143,25 @@ public class OrderingService {
         }
 
         return orderListResDtoList;
+    }
+
+    public void orderCancel(Long orderId) throws JsonProcessingException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+
+//        Ordering DB에 상태값 변경 CANCELED
+        Ordering ordering = orderingRepository.findById(orderId).orElseThrow(()->new EntityNotFoundException("주문을 찾을수없습니다."));
+        ordering.cancelStatus(OrderStatus.CANCELED);
+        for(OrderDetail orderDetail: ordering.getOrderDetailList()){
+            orderDetail.getProduct().cancelOrder(orderDetail.getQuantity());
+            stockInventoryService.increaseStockQuantity(
+                    orderDetail.getProduct().getId(),
+                    orderDetail.getQuantity()
+            );
+        }
+
+//        주문성공시 admin유저에게 메시지 전송
+        sseAlarmService.publishMessage("admin@naver.com",email,ordering.getId());
+
     }
 }

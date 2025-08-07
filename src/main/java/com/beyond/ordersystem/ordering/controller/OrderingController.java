@@ -1,13 +1,16 @@
 package com.beyond.ordersystem.ordering.controller;
 
 import com.beyond.ordersystem.common.dto.CommonSuccessDto;
+import com.beyond.ordersystem.ordering.domain.Ordering;
 import com.beyond.ordersystem.ordering.dto.OrderCreateDto;
 import com.beyond.ordersystem.ordering.dto.OrderListResDto;
 import com.beyond.ordersystem.ordering.service.OrderingService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.Array;
@@ -46,6 +49,14 @@ public class OrderingController {
                         orderListResDtoList,
                         HttpStatus.OK.value(),
                         "주문목록 조회 성공"), HttpStatus.OK);
+    }
+    @DeleteMapping("/cancel/{orderId}")
+    public ResponseEntity<?> orderCancel(@PathVariable Long orderId) throws JsonProcessingException {
+        orderingService.orderCancel(orderId);
+        return new ResponseEntity<>(
+                new CommonSuccessDto(null,HttpStatus.OK.value(), "주문취소성공"),
+                HttpStatus.OK
+        );
     }
 
 

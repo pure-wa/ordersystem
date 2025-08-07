@@ -30,4 +30,8 @@ public class Ordering extends BaseTimeEntity {
     @OneToMany(mappedBy = "ordering", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<OrderDetail> orderDetailList = new ArrayList<>();
+    public void cancelStatus(OrderStatus orderStatus){
+        this.orderStatus = orderStatus;
+    }
+
 }

@@ -1,6 +1,5 @@
 package com.beyond.ordersystem.common.config;
 
-
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -14,34 +13,34 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMqConfig {
     @Value("${spring.rabbitmq.host}")
     private String host;
-    @Value("${spring.rabbitmq.host}")
-    private String port;
-    @Value("${spring.rabbitmq.host}")
+    @Value("${spring.rabbitmq.port}")
+    private int port; // String에서 int로 변경
+    @Value("${spring.rabbitmq.username}")
     private String username;
-    @Value("${spring.rabbitmq.host}")
+    @Value("${spring.rabbitmq.password}")
     private String password;
-    @Value("${spring.rabbitmq.host}")
+    @Value("${spring.rabbitmq.virtual-host}")
     private String virtualHost;
 
-//    스프링빈 생성을 통해 rebbitM Q에 자동으로 아래 변수명으로 큐가 생성
+    // 스프링 빈 생성을 통해 RabbitMQ 큐에 자동으로 아래 변수명으로 큐 생성
     @Bean
-    public Queue stockQueue(){
-        return new Queue("stockDecreaseQueue",true);
+    public Queue stockQueue() {
+        return new Queue("stockDecreaseQueue", true);
     }
 
     @Bean
-    public ConnectionFactory connectionFactory(){
+    public ConnectionFactory connectionFactory() {
         CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
         connectionFactory.setHost(host);
-        connectionFactory.setHost(port);
-        connectionFactory.setHost(username);
-        connectionFactory.setHost(password);
-        connectionFactory.setHost(virtualHost);
+        connectionFactory.setPort(port);
+        connectionFactory.setUsername(username);
+        connectionFactory.setPassword(password);
+        connectionFactory.setVirtualHost(virtualHost);
         return connectionFactory;
     }
 
     @Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory){
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
         return rabbitTemplate;

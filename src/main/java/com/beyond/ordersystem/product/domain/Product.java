@@ -29,6 +29,7 @@ public class Product extends BaseTimeEntity {
     @Setter
     private String productImgae;
 
+
     public void updateProduct(String name, String category, int price, int stockQuantity) {
         this.name = name;
         this.category = category;
@@ -44,5 +45,8 @@ public class Product extends BaseTimeEntity {
             return true;
         }
     }
-
+    public void cancelOrder(int orderquantity){
+        this.stockQuantity += orderquantity;
+    }
 }
+
